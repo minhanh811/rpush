@@ -92,6 +92,7 @@ module Rpush
                 json['aps']['attributes'] = data[LIVE_ACTIVITY_KEY]['attributes'] if data[LIVE_ACTIVITY_KEY]['attributes']
                 json['aps']['content-state'] = data[LIVE_ACTIVITY_KEY]['content-state'] if data[LIVE_ACTIVITY_KEY]['content-state']
                 json['aps']['dismissal-date'] = data[LIVE_ACTIVITY_KEY]['dismissal-date'] if data[LIVE_ACTIVITY_KEY]['dismissal-date']
+                json['aps']['alert'] = data[LIVE_ACTIVITY_KEY]['alert'] if data[LIVE_ACTIVITY_KEY]['alert']
               end
 
               if data
