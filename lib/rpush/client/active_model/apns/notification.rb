@@ -57,6 +57,12 @@ module Rpush
             (self.data || {})[CONTENT_AVAILABLE_KEY]
           end
 
+          LIVE_ACTIVITY_KEY = '__rpush_live_activity__'
+          def live_activity=(hash)
+            return unless hash
+            self.data = (data || {}).merge(LIVE_ACTIVITY_KEY => hash)
+          end
+
           def as_json(options = nil) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
             json = ActiveSupport::OrderedHash.new
 
@@ -79,8 +85,18 @@ module Rpush
                 json['aps']['content-available'] = 1
               end
 
+              if data && data[LIVE_ACTIVITY_KEY]
+                json['aps']['timestamp'] = data[LIVE_ACTIVITY_KEY].fetch('timestamp', Time.now.to_i)
+                json['aps']['event'] = data[LIVE_ACTIVITY_KEY]['event']
+                json['aps']['attributes-type'] = data[LIVE_ACTIVITY_KEY]['attributes-type'] if data[LIVE_ACTIVITY_KEY]['attributes-type']
+                json['aps']['attributes'] = data[LIVE_ACTIVITY_KEY]['attributes'] if data[LIVE_ACTIVITY_KEY]['attributes']
+                json['aps']['content-state'] = data[LIVE_ACTIVITY_KEY]['content-state'] if data[LIVE_ACTIVITY_KEY]['content-state']
+                json['aps']['dismissal-date'] = data[LIVE_ACTIVITY_KEY]['dismissal-date'] if data[LIVE_ACTIVITY_KEY]['dismissal-date']
+                json['aps']['alert'] = data[LIVE_ACTIVITY_KEY]['alert'] if data[LIVE_ACTIVITY_KEY]['alert']
+              end
+
               if data
-                non_aps_attributes = data.reject { |k, _| k == CONTENT_AVAILABLE_KEY || k == MUTABLE_CONTENT_KEY }
+                non_aps_attributes = data.reject { |k, _| k == CONTENT_AVAILABLE_KEY || k == MUTABLE_CONTENT_KEY || k == LIVE_ACTIVITY_KEY }
                 non_aps_attributes.each { |k, v| json[k.to_s] = v }
               end
             end
